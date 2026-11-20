@@ -1,0 +1,21 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Public website forms may create enquiries only. No public reads, edits or deletes.
+    match /bookings/{bookingId} {
+      allow create: if request.resource.data.keys().hasAll(['customerName','phone','service','address','preferredDate','status','createdAt'])
+        && request.resource.data.customerName is string && request.resource.data.customerName.size() >= 2 && request.resource.data.customerName.size() <= 100
+        && request.resource.data.phone is string && request.resource.data.phone.size() >= 8 && request.resource.data.phone.size() <= 20
+        && request.resource.data.service in ['Electrical','Plumbing','CCTV Installation','AC Service']
+        && request.resource.data.status == 'pending';
+      allow read, update, delete: if false;
+    }
+    match /contacts/{contactId} {
+      allow create: if request.resource.data.keys().hasAll(['name','phone','message','createdAt'])
+        && request.resource.data.name is string && request.resource.data.name.size() >= 2 && request.resource.data.name.size() <= 100
+        && request.resource.data.phone is string && request.resource.data.phone.size() >= 8 && request.resource.data.phone.size() <= 20
+        && request.resource.data.message is string && request.resource.data.message.size() <= 2000;
+      allow read, update, delete: if false;
+    }
+  }
+}

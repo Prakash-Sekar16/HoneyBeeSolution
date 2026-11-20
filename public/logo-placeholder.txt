@@ -1,0 +1,1 @@
+Add your HoneyBee logo as public/logo.png.
